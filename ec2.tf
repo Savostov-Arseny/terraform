@@ -1,8 +1,20 @@
+#Data source to get ami id of Ubuntu 18.04
+data "aws_ami" "ubuntu_ami" {
+  most_recent = true
+
+  filter {
+    name   = "name"
+    values = ["ubuntu/images/hvm-ssd/ubuntu-bionic-18.04-amd64-server-*"]
+  }
+
+  owners = ["099720109477"] #Canonical
+}
+
 resource "aws_instance" "Swarm_master" {
   count                  = 1
-  ami                    = "${var.ami}"
-  instance_type          = "${var.instance_type}"
-  key_name               = "${var.key_name}"
+  ami                    = "${data.aws_ami.ubuntu_ami.id}"
+  instance_type          = var.instance_type
+  key_name               = var.key_name
   user_data              = file("${var.bootstrap_swarm_path}")
   vpc_security_group_ids = ["${aws_security_group.swarm.id}"]
   tags = {
@@ -12,31 +24,23 @@ resource "aws_instance" "Swarm_master" {
 
 resource "aws_instance" "Swarm_agent" {
   count                  = 8
-  ami                    = "${var.ami}"
-  instance_type          = "${var.instance_type}"
-  key_name               = "${var.key_name}"
-  user_data              = file("${var.bootstrap_swarm_path}")
+  ami                    = "${data.aws_ami.ubuntu_ami.id}"
+  instance_type          = var.instance_type
+  key_name               = var.key_name
+  user_data              = file(var.bootstrap_swarm_path)
   vpc_security_group_ids = ["${aws_security_group.swarm.id}"]
   tags = {
     Name = "Swarm_agent_${count.index}"
   }
 }
 
-#Using a template to pass freshly created i_am keys
-resource "template_file" "user_data_management" {
-  template = "${file("${var.bootstrap_management_path}")}"
-  vars = {
-    access = "${aws_iam_access_key.adi.id}"
-    secret = "${aws_iam_access_key.adi.secret}"
-  }
-}
 
 resource "aws_instance" "Management_master" {
   count                  = 1
-  ami                    = "${var.ami}"
-  instance_type          = "${var.instance_type}"
-  key_name               = "${var.key_name}"
-  user_data              = "${template_file.user_data_management.rendered}"
+  ami                    = "${data.aws_ami.ubuntu_ami.id}"
+  instance_type          = var.instance_type
+  key_name               = var.key_name
+  user_data              = templatefile(var.bootstrap_management_path, { access = "${aws_iam_access_key.adi.id}", secret = "${aws_iam_access_key.adi.secret}" })
   vpc_security_group_ids = ["${aws_security_group.swarm.id}"]
   tags = {
     Name = "Management_master"
