@@ -27,5 +27,5 @@ variable "bootstrap_swarm_path" {
 
 variable "bootstrap_management_path" {
   description = "Script to install Docker Engine and all management tools"
-  default     = "Bootstrap_scripts/user_data_management.sh.tpl"
+  default     = "Bootstrap_scripts/user_data_management.tmpl"
 }
