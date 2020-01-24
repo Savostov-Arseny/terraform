@@ -1,0 +1,19 @@
+#!/bin/bash
+
+#install python
+apt-get -y update
+apt-get -y install python
+
+#Pull management tools repo & install Ansible
+git clone https://github.com/Savostov-Arseny/management-tools.git
+chmod +x ./management-tools/Ansible/host_configure.sh
+cd /management-tools/Ansible
+./host_configure.sh
+
+#Pass ssh private key
+echo "${private_key}" > /home/ubuntu/.ssh/id_rsa
+chmod 400 /home/ubuntu/.ssh/id_rsa
+chown ubuntu:ubuntu /home/ubuntu/.ssh/id_rsa
+
+#Execute playbook, to set up docker swarm
+ansible-playbook /etc/ansible/playbooks/set_up_swarm.yml

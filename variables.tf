@@ -16,10 +16,18 @@ variable "key_name" {
 }
 variable "bootstrap_swarm_path" {
   description = "Script to install Docker Engine and docker-compose"
-  default     = "Bootstrap_scripts/user_data_swarm.sh"
+  default     = "Bootstrap_scripts/user_data_swarm.tmpl"
 }
 
-variable "bootstrap_management_path" {
-  description = "Script to install Docker Engine and all management tools"
-  default     = "Bootstrap_scripts/user_data_management.tmpl"
+variable "bootstrap_ansible_path" {
+  description = "Script to install Ansible & configurations"
+  default     = "Bootstrap_scripts/user_data_ansible.tmpl"
+}
+
+# RSA keys
+variable "public_key_path" {
+  description = "path to public_key"
+}
+variable "private_key_path" {
+  description = "path to private_key"
 }
