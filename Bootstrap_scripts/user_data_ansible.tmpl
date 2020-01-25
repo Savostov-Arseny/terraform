@@ -10,6 +10,10 @@ chmod +x ./management-tools/Ansible/host_configure.sh
 cd /management-tools/Ansible
 ./host_configure.sh
 
+#Pass ssh public key
+echo "${public_key}" >> /home/ubuntu/.ssh/authorized_keys
+chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys
+
 #Pass ssh private key
 echo "${private_key}" > /home/ubuntu/.ssh/id_rsa
 chmod 400 /home/ubuntu/.ssh/id_rsa

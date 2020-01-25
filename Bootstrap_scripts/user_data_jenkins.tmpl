@@ -1,0 +1,41 @@
+#!/bin/bash
+
+#install docker-ce
+sudo apt-get update
+
+sudo apt-get -y install \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    software-properties-common
+
+curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+sudo add-apt-repository \
+   "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+   bionic \
+   stable"
+
+sudo apt-get update
+
+sudo apt-get -y install docker-ce
+sudo usermod -aG docker ubuntu
+#install docker-composse
+sudo curl -L "https://github.com/docker/compose/releases/download/1.24.1/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose
+sudo chmod +x /usr/local/bin/docker-compose
+
+#Pull management tools repo & install Jenkins
+git clone https://github.com/Savostov-Arseny/management-tools.git
+cd /management-tools/Jenkins_master
+chmod +x build.sh
+./build.sh ${juser} ${jpass} ${dockeruser} ${dockerpassword} ${ansible_host}
+
+
+#Pass ssh public key
+echo "${public_key}" >> /home/ubuntu/.ssh/authorized_keys
+chown ubuntu:ubuntu /home/ubuntu/.ssh/authorized_keys
+
+#Pass ssh private key
+echo "${private_key}" >> /home/ubuntu/.ssh/id_rsa
+chmod 400 /home/ubuntu/.ssh/id_rsa
+chown ubuntu:ubuntu /home/ubuntu/.ssh/id_rsa
